@@ -1,0 +1,39 @@
+
+ IN 10H
+ LXI B,01F4H  ; Insert a delay of 500ms
+ MVI D,FEH    ; Startpoint of the lighted LED is the rightmost LED 
+
+START:
+ 
+ LDA 2000H ; Put the input to accumulator
+ RRC       ; Right rotation : (An)<-(An+1), (CY)<-(A7), (A0)<-(CY)
+  
+ JNC START ; If (CY)=0 go to START
+ 
+ RLC    ;  Left rotation : (An+1)<-(An), (A0)<-(A7), (CY)<-(A7) to get to the initial state 
+ RLC    ;  Left rotation : (An+1)<-(An), (A0)<-(A7), (CY)<-(A7) to snatch the MSB through CY
+
+ JC RIGHT_LEFT   ; Do the RIGHT to LEFT 
+ JMP LEFT_RIGHT  ; DO the LEFT to RIGHT
+
+RIGHT_LEFT:
+  
+ MOV A,D   ; Transfer the previous state to the accumulator from D
+ STA 3000H ; Store to the output address of LEDs 
+ RLC       ; Left rotation : (An+1)<-(An), (A0)<-(A7), (CY)<-(A7)
+ CALL DELB ; Triggers the delay of 500ms
+ MOV D,A   ; Saves the position of the ON LED
+ JMP START ; Repeat the whole check of input
+
+LEFT_RIGHT:
+
+ MOV A,D    ; Transfer the previous state to the accumulator from D
+ STA 3000H  ; Store to the output address of LEDs 
+ RRC        ; Right rotation : (An)<-(An+1), (CY)<-(A7), (A0)<-(CY)
+ CALL DELB  ; Triggers the delay of 500ms
+ MOV D,A    ; Saves the position of the ON LED
+ JMP START  ; Repeat the whole check of input 
+
+ END
+
+

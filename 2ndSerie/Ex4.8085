@@ -1,0 +1,58 @@
+START:
+		;X3
+	LDA 2000H
+	ANI 80H ;A3 (8th switch)
+	RRC ;move A3 to 7th switch
+	MOV B,A ;save A3(7th) -> B
+	LDA 2000H
+	ANI 40H ;B3 (7th switch)
+	XRA B ;A3 xor B3 -> A
+	RRC ;(6th)
+	RRC ;(5th)
+	RRC ;(4th)
+	RRC ;(3rd)
+	MOV C,A ;save (A3 xor B3)
+	RLC ;(4th)
+	MOV D,A ;save A(4th)
+		;X2
+	LDA 2000H
+	ANI 20H ;A2 (6th)
+	RRC ;5th
+	MOV B,A ;save A2(5th) -> B
+	LDA 2000H
+	ANI 10H ;B2 (5th)
+	XRA B ;B2 xor A2 -> A
+	RRC ;(4th)
+	RRC ;(3rd)
+	ORA C ;C(A3 xor B3) or A(B2 xor A2)
+	ORA D ;[(A3 xor B3) or (A2 xor B2)](3rd) or D(4th)
+	MOV D,A ;save A(3rd and 4th)
+		;X1
+	LDA 2000H
+	ANI 08H ;A1 (4th)
+	RRC ;(3rd)
+	MOV B,A ;save A1(3rd) -> B
+	LDA 2000H
+	ANI 04H ;B1(3rd)
+	ANA B ;(A1 and B1)
+	RRC ;(2nd)
+	RRC ;(1st)
+	MOV C,A ;save (A1 and B1)
+	RLC ;(2nd)
+	ORA D ;D(3rd, 4th) or (A1 and B1) (2nd)
+	MOV D,A
+		;X0
+	LDA 2000H
+	ANI 02H ;A0 (2nd)
+	RRC ;A0 (1st)
+	MOV B,A ;save A0(1st) -> B
+	LDA 2000H
+	ANI 01H ;B0 (1st)
+	ANA B ;(A0 and B0)
+	ORA C ;(A0 or B0) or C
+	ORA D
+
+	CMA
+	STA 3000H
+	JMP START
+	END

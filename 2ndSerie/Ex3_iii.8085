@@ -1,0 +1,183 @@
+
+START:
+	IN 10H
+	LXI H,0A00H
+	MVI B,04H
+L1:
+	MVI M,10H
+	INX H
+	DCR B
+	JNZ L1 
+
+ROW_7:
+	MVI A,7FH ; (7F)hex = (01111111)bin to pick the 7TH row  
+	STA 2800H ; 
+	LDA 1800H ; 
+	ANI 07H   ; 
+	
+	MVI C,0DH  ; D
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,0EH  ; E
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,0FH  ; F
+	CPI 03H ; 
+	JZ OUTPUT ;
+
+ROW_6:
+	MVI A,BFH ; (BF)hex = (10111111)bin to pick the 6TH row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+
+	
+	MVI C,0AH  ; A
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,0BH  ; B
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,0CH  ; C
+	CPI 03H ; 
+	JZ OUTPUT ;
+
+
+ROW_5:
+	MVI A,DFH ; (DF)hex = (11011111)bin to pick the 5TH row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+		
+	MVI C,07H  ; 7
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,08H  ; 8
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,09H  ; 9
+	CPI 03H ; 
+	JZ OUTPUT ;
+
+
+ROW_4:
+	MVI A,EFH ; (EF)hex = (11101111)bin to pick the 4TH row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+	
+		
+	MVI C,04H  ; 4
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,05H  ; 5
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,06H  ; 6
+	CPI 03H ; 
+	JZ OUTPUT ;
+
+
+ROW_3:
+	MVI A,F7H ; (F7)hex = (11110111)bin to pick the 3RD row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+	
+	
+	MVI C,01H  ; 1
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,02H  ; 2
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,03H  ; 3
+	CPI 03H ; 
+	JZ OUTPUT ;
+	
+ROW_2:
+	MVI A,FBH ; (FB)hex = (11111011)bin to pick the 2ND row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+
+	MVI C,00H  ; 0 
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,83H  ; STORE/INCR
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,81H  ; DECR
+	CPI 03H ; 
+	JZ OUTPUT ;
+
+ROW_1:
+	MVI A,FDH ; (FD)hex = (11111101)bin to pick the 1ST row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+		
+	MVI C,84H  ; RUN 
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,80H  ; FETCH REG
+ 	CPI 05H
+	JZ OUTPUT
+
+ 	MVI C,82H  ; FETCH ADDRESS
+	CPI 03H ; 
+	JZ OUTPUT ;
+
+
+ROW_0:
+	MVI A,FEH ; (FE)hex = (11111110)bin to pick the 0 row  
+	STA 2800H ; 
+	LDA 1800H
+	ANI 07H
+
+	MVI C,86H  ; INSTR STEP 
+	CPI 06H
+	JZ OUTPUT  ;
+ 
+	MVI C,85H  ; FETCH PC
+ 	CPI 05H
+	JZ OUTPUT
+
+	JMP START
+
+OUTPUT:
+	LXI H,0A04H      
+	MOV A,C
+	ANI 0FH
+	MOV M,A
+	
+	INX H
+	MOV A,C
+      ANI F0H ; (F0)HEX = (1111 0000)BIN
+	RLC
+	RLC	
+	RLC
+	RLC
+	MOV M,A 
+
+	LXI D,0A00H
+	CALL STDM
+	CALL DCD
+
+	JMP START
+	
+	END
+	

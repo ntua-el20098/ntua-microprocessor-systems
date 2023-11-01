@@ -1,0 +1,20 @@
+START:
+
+MVI C,08H ; Moves the number 8 into the C register
+LDA 2000H ; Loads to the register A the content of the address 2000 
+
+RETRY:
+
+RAL ;       Left rotation of the content of the A register
+JC SAVE ;   If CY = 1 then go to SAVE label else continue to DCR
+DCR C   ;   (C) <- (C)-1
+JNZ RETRY ; If Z =! 0 then go to label RETRY 
+
+SAVE:
+
+MOV A,C ;    (A) <- (C)
+CMA ;        (A) <- (A') 
+STA 3000H  ; The content of A register goes to the 3000H memory slot 
+JMP START ;  Return to START 
+
+END

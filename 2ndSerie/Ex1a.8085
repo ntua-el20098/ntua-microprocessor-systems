@@ -1,0 +1,81 @@
+
+;(a)
+
+START:
+	IN 10H ; disable memory protection 
+	MVI A,00H ; (A) <- 0
+	LXI H,0900H ; (H) <- 09 , (L) <- 00
+	MOV M,A  ; M((H)(L)) <- (A)
+STORE:
+       INR A   ; (A) <- (A) + 1
+	INX H   ; ((H)(L)) <- ((H)(L)) + 1
+	MOV M,A ; M((H)(L)) <- (A)
+	CPI 7FH ; Is A < 127 ?
+	JC STORE ; If yes then repeat
+
+;(b)
+
+       LXI B,0000H
+RESET_COUNTER:
+	MOV A,M
+       MVI D,09H
+CHECK_DIGITS:
+       DCR D ; Next digit of the number
+	JZ PREVIOUS_ONE ; If we are out of digits next memory location, next number
+       RRC ; Search for 1
+       JNC CHECK_DIGITS 
+COUNT: 
+	INX B ; we have 1 additional 1 
+	JMP CHECK_DIGITS
+PREVIOUS_ONE:
+	DCR L ;check the previous memory slot 
+	JNZ RESET_COUNTER
+OUTPUT:
+	LDA 2000H
+	RRC
+	JC MSB
+LSB:	
+ 	MOV A,C
+	STA 3000H
+	LDA 2000H
+	RLC 
+	JC COUNT_NUM
+	JMP OUTPUT
+MSB:	
+	MOV A,B
+	STA 3000H
+	LDA 2000H
+	RLC 
+	JC COUNT_NUM
+	JMP OUTPUT	
+	
+;(c)
+
+COUNT_NUM:
+	MVI E,7FH
+	MVI D,00H    ;Initialise D
+	MOV A,M      ;Load first Number ((H)(L))=0900H from before
+STATEMENT:
+	CPI 10H      ;If A<10H skip this nummber else continue
+	JC SKIP
+	CPI 61H      ;If A>60H skip this number else continue and add it to the total 
+	JNC SKIP
+	INR D        ;Count    
+	JZ CHECK_LAST
+SKIP:	
+	INR L        ;Load next number
+	MOV A,M
+	DCR E
+	JZ CHECK_LAST   ;If E=00H CHECK_LAST else jump to STATEMENT
+	JMP STATEMENT
+CHECK_LAST:
+	CPI 10H      
+	JC OUTPUT_2
+	CPI 61H      
+	JNC OUTPUT_2
+	INR D        		
+OUTPUT_2: 
+	MOV A,D
+	STA 3000H
+	
+	END

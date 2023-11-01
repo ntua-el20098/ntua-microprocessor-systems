@@ -1,0 +1,27 @@
+
+START:
+	CALL KIND ; read the number pressed and put it into A reg
+	CPI 00H   ;If (A)<=0 is pressed go to off mode
+	JZ OFF
+	CPI 09H   ;If (A)>=9 is pressed go to off mode
+	JNC OFF
+	MOV B,A   ;Save A register to B. We will need A somewhere else
+	MVI A,00H  ;We initiliaze A 
+ON_LOOP:
+	DCR B
+	JZ OUTPUT
+	RLC ; basically we multiply by 2 to create one more zero at the LSB 
+	INR A ; then we add 1 to make the last 0 -> 1
+	JMP ON_LOOP
+OUTPUT:
+	STA 3000H 
+	JMP START  ; read the keyboard again
+
+OFF:
+	MVI A,FFH  ; Do not light up anything
+	STA 3000H
+	JMP START
+	
+	END
+	
+	

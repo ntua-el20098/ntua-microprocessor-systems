@@ -1,0 +1,30 @@
+
+START:
+	LDA 2000H
+	MVI B,08H
+SEARCH:  
+	RRC 
+	JC O_INIT ; if first on switch is found then go to output initialization
+	DCR B	; search the next digit 
+	JZ NO_LEDS ; if you reach zero then no switch was on so all LEDs OFF
+	JMP SEARCH   ; continue searching 
+O_INIT:
+	MVI A,80H ; (A)<- 10000000
+	DCR B  ; (B)<- just making sure we have the right place of LED to print
+OUTPUT:
+	RRC ; move the 1 from end to start
+	DCR B ; decrease B until it reaches 0 then we are at the right place
+	JNZ OUTPUT
+O_FINAL:
+	CMA ; (A)<-(A')
+	STA 3000H
+	JMP START
+
+NO_LEDS:
+	MVI A,00H
+	CMA ; (A)<-(A')
+	STA 3000H
+	JMP START
+
+	END
+	
